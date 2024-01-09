@@ -1,0 +1,10 @@
+SELECT ROW_NUMBER() OVER(ORDER BY Driver,Trip,Starttime,starting) AS Event
+      ,[driver] AS Driver
+      ,[trip] AS Trip
+      ,[starttime] AS Starttime
+      ,[endtime] AS Endtime
+	  ,starting AS TailgatingStarttime
+	  ,ending AS TailgatingEndtime
+  FROM [LV_ShanTeam].[dbo].[Tailgating]
+  GROUP BY [driver],[trip],[starttime],[endtime],starting,ending
+  ORDER BY Event

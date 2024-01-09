@@ -1,0 +1,37 @@
+SELECT B.[Driver]
+      ,B.[Trip]
+	  ,B.[StartTime]
+      ,B.[EndTime]
+FROM (
+SELECT A.[Driver]
+      ,A.[Trip]
+      ,A.[StartTime]
+      ,A.[EndTime]
+      ,A.[Value]
+	  ,B.BoundaryLeft AS BL1
+	  ,B.BoundaryRight AS BR1
+	  ,B.Speed AS S1
+	  ,B.LaneOffsetConf AS C1
+	  ,C.BoundaryLeft AS BL2
+	  ,C.BoundaryRight AS BR2
+	  ,C.Speed AS S2
+	  ,C.LaneOffsetConf AS C2
+	  ,D.BoundaryLeft AS BL3
+	  ,D.BoundaryRight AS BR3
+	  ,D.Speed AS S3
+	  ,D.LaneOffsetConf AS C3
+	  ,E.BoundaryLeft AS BL4
+	  ,E.BoundaryRight AS BR4
+	  ,E.Speed AS S4
+	  ,E.LaneOffsetConf AS C4
+	  ,F.RoadType AS R1
+	  ,G.RoadType AS R2
+  FROM (((((([LvPub].[dbo].[LaneChangeEvents] AS A INNER JOIN [LvFot].[dbo].[Data] AS B ON A.Driver=B.Driver AND A.Trip=B.Trip AND  A.StartTime=B.Time)
+		INNER JOIN [LvFot].[dbo].[Data] AS C ON A.Driver=C.Driver AND A.Trip=C.Trip AND  A.StartTime+10=C.Time AND C.Speed>=22.352 AND C.LaneOffsetConf=100)
+		INNER JOIN [LvFot].[dbo].[Data] AS D ON A.Driver=D.Driver AND A.Trip=D.Trip AND  A.EndTime-10=D.Time AND D.Speed>=22.352 AND D.LaneOffsetConf=100)
+		INNER JOIN [LvFot].[dbo].[Data] AS E ON A.Driver=E.Driver AND A.Trip=E.Trip AND  A.EndTime=E.Time AND E.Speed>=22.352 AND E.LaneOffsetConf=100)
+		INNER JOIN [LvPub].[dbo].[RoadTypeEvents] AS F ON A.Driver=F.Driver AND A.Trip=F.Trip AND  (A.StartTime-1500 BETWEEN F.StartTime AND F.EndTime))
+		INNER JOIN [LvPub].[dbo].[RoadTypeEvents] AS G ON A.Driver=G.Driver AND A.Trip=G.Trip AND  (A.EndTime+5000 BETWEEN G.StartTime AND G.EndTime)) ) AS B
+	WHERE B.R1=1 AND B.R2=1 AND B.BL1=B.BL2 AND B.BL1=B.BL3 AND B.BL1=B.BL4 AND B.BR1=B.BR2 AND B.BR1=B.BR3 AND B.BR1=B.BR4
+
+	ORDER BY Driver,Trip,StartTime

@@ -1,0 +1,7 @@
+  SELECT A.[Driver]
+		,A.[Trip]
+		,A.[Speed]
+		,A.[Time]
+  FROM [LvFot].[dbo].[Data] as A, [LvPub].[dbo].[RoadtypeEvents] as B
+  Where b.Roadtype=1 and a.Driver=b.Driver and a.Trip=b.Trip and (a.Time between b.StartTime and b.EndTime ) and a.[Speed] >= 33.528
+  ORDER BY [Driver],[Trip]

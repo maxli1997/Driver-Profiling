@@ -1,0 +1,12 @@
+
+SELECT DISTINCT ROW_NUMBER() OVER(ORDER BY A.Driver,A.Trip,A.StartTime) AS Event
+			  ,A.[Driver]
+			  ,A.[Trip]
+			  ,A.[StartTime] as [BrakeStartTime]
+			  ,A.[EndTime] as [BrakeEndTime]
+			  
+		  FROM (([TeenPub].[dbo].[BrakeEvents] as A INNER JOIN [TeenPub].[dbo].[RoadtypeEvents] as B ON A.[Brake]=1 and B.[Roadtype]=1 and A.[Driver]=B.[Driver] and A.[Trip]=B.[Trip] and A.[StartTime] >= B.[StartTime] and A.[EndTime] <= B.[EndTime])
+				INNER JOIN 
+				(SELECT [Driver],[Trip],[Time],[Ax] From [TeenFot].[dbo].[Imu] Where [TeenFot].[dbo].[Imu].[Ax]<=-2.94) as C ON A.[Driver]=C.[Driver] and A.[Trip]=C.[Trip]  and A.[StartTime] <= C.[Time] and A.[EndTime] >= C.[Time])
+			GROUP BY A.Driver,A.Trip,A.StartTime,A.EndTime
+				ORDER BY Event

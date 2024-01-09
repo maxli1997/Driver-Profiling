@@ -1,0 +1,21 @@
+SELECT A.Event, A.starttime,A.endtime, A.Driver, A.Trip, A.Time, A.Speed, A.TurnSignal, A.Wipers, A.GpsValid, A.Latitude, A.Longitude, A.LaneOffset, A.Engaged AS CruiseControl,
+				B.RoadType,C.Ax,C.Ay,C.Az,D.TotalCount AS Traffic,F.Treatment,E.Week,G.Range,G.RangeRate
+  FROM 
+	(SELECT A.Driver,A.Trip,Time,Speed,TurnSignal,Wipers,GpsValid,Latitude,Longitude,LaneOffset,Engaged,Event,starttime,endtime  FROM TeenFot.dbo.Data AS A 
+	INNER JOIN (SELECT DISTINCT ROW_NUMBER() OVER(ORDER BY A.Driver,A.Trip,A.Starttime) AS Event,A.[Driver],A.[Trip],A.[starttime],A.[endtime] FROM [Lv_Shan].[dbo].[TeenCIPVth] AS A INNER JOIN TeenPub.dbo.RoadTypeEvents AS B ON B.RoadType=1 AND A.Driver=B.Driver AND A.Trip=B.Trip AND A.starttime>=B.StartTime AND A.endtime<= B.EndTime WHERE headway <= 1 GROUP BY A.Driver,A.Trip,A.starttime,A.endtime) AS H
+	ON A.Driver=H.Driver AND A.Trip=H.Trip AND (A.Time BETWEEN H.Starttime AND H.Endtime)) AS A
+	INNER JOIN
+	(SELECT Driver,Trip,StartTime,EndTime, RoadType FROM TeenPub.dbo.RoadtypeEvents) AS B ON A.Driver=B.Driver AND A.Trip=B.Trip AND (A.Time BETWEEN B.StartTime AND B.EndTime)
+	INNER JOIN
+	(SELECT Driver,Trip,Time,Ax,Ay,Az FROM TeenFot.dbo.Imu) AS C ON A.Driver=C.Driver AND A.Trip = C.Trip AND A.Time=C.Time
+	INNER JOIN 
+	(SELECT Driver,Trip,Time,TotalCount FROM TeenPub.dbo.TrafficCount) AS D ON A.Driver=D.Driver AND A.Trip=D.Trip AND A.Time=D.Time
+	INNER JOIN 
+	(SELECT Driver,Trip,Treatment FROM TeenFot.dbo.ValidTrips) AS F ON A.Driver=F.Driver AND A.Trip=F.Trip
+	INNER JOIN 
+	TeenFot.dbo.TripWeek AS E ON A.Driver=E.Driver AND A.Trip=E.Trip
+	INNER JOIN 
+	(SELECT Driver,Trip,Time,Range,RangeRate FROM TeenPub.dbo.CipvThConflict) AS G ON A.Driver=G.Driver AND A.Trip=G.Trip AND A.Time=G.Time
+	
+		  
+

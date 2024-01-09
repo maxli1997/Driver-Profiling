@@ -1,0 +1,13 @@
+SELECT H.Event, H.Starttime, H.Endtime, H.TailgatingStarttime, H.TailgatingEndtime, A.Driver, A.Trip, A.Time, A.Speed, E.Range, E.RangeRate, A.TurnSignal, A.Wipers, A.GpsValid, A.Latitude, A.Longitude, A.LaneOffset, A.Engaged AS CruiseControl
+		,B.Roadtype, C.Ax, C.Ay, C.Az, D.TotalCount AS TrafficCount, F.Treatment, F.Week, F.AgeGroup, F.Gender, E.TH AS TimeHeadway
+  FROM (((((LvFot.dbo.Data AS A INNER JOIN LvPub.dbo.RoadtypeEvents AS B ON A.Driver=B.Driver AND A.Trip=B.Trip AND (A.Time BETWEEN B.StartTime AND B.EndTime))
+	INNER JOIN LvFot.dbo.Imu AS C ON A.Driver=C.Driver AND A.Trip = C.Trip AND A.Time=C.Time)
+	INNER JOIN LvPub.dbo.TrafficCount AS D ON A.Driver=D.Driver AND A.Trip=D.Trip AND A.Time=D.Time)
+	INNER JOIN LvFot.dbo.ValidTrips AS F ON A.Driver=F.Driver AND A.Trip=F.Trip)
+	INNER JOIN LvPub.dbo.CipvThConflict AS E ON A.Driver=E.Driver AND A.Trip=E.Trip AND A.Time=E.Time)
+	INNER JOIN LV_ShanTeam.dbo.TailgatingEvents AS H
+		ON A.Driver=H.Driver AND A.Trip=H.Trip AND (A.Time BETWEEN H.Starttime AND H.Endtime)
+
+	ORDER BY Event,Driver,Trip,Time
+		  
+

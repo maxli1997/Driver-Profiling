@@ -1,0 +1,24 @@
+SELECT H.Event, H.Starttime, H.Endtime, A.Driver, A.Trip, A.Time, A.Speed, A.TurnSignal, A.Wipers, A.GpsValid, A.Latitude, A.Longitude, A.LaneOffset, A.Engaged AS CruiseControl
+		,B.Roadtype, C.Ax, C.Ay, C.Az, D.TotalCount AS TrafficCount, F.Treatment, E.Week
+  FROM (((((TeenFot.dbo.Data AS A INNER JOIN TeenPub.dbo.RoadtypeEvents AS B ON A.Driver=B.Driver AND A.Trip=B.Trip AND (A.Time BETWEEN B.StartTime AND B.EndTime))
+	INNER JOIN TeenFot.dbo.Imu AS C ON A.Driver=C.Driver AND A.Trip = C.Trip AND A.Time=C.Time)
+	INNER JOIN TeenPub.dbo.TrafficCount AS D ON A.Driver=D.Driver AND A.Trip=D.Trip AND A.Time=D.Time)
+	INNER JOIN TeenFot.dbo.ValidTrips AS F ON A.Driver=F.Driver AND A.Trip=F.Trip)
+	INNER JOIN TeenFot.dbo.TripWeek AS E ON A.Driver=E.Driver AND A.Trip=E.Trip)
+	INNER JOIN 
+		(SELECT DISTINCT ROW_NUMBER() OVER(ORDER BY A.Driver,A.Trip,A.StartTime) AS Event
+			  ,A.[Driver]
+			  ,A.[Trip]
+			  ,A.[StartTime] as Starttime
+			  ,A.[EndTime] as Endtime
+			  
+		  FROM (([TeenPub].[dbo].[BrakeEvents] as A INNER JOIN [TeenPub].[dbo].[RoadtypeEvents] as B ON A.[Brake]=1 and B.[Roadtype]=1 and A.[Driver]=B.[Driver] and A.[Trip]=B.[Trip] and A.[StartTime] >= B.[StartTime] and A.[EndTime] <= B.[EndTime])
+				INNER JOIN 
+				(SELECT [Driver],[Trip],[Time],[Ax] From [TeenFot].[dbo].[Imu] Where [TeenFot].[dbo].[Imu].[Ax]<=-2.94) as C ON A.[Driver]=C.[Driver] and A.[Trip]=C.[Trip]  and A.[StartTime] <= C.[Time] and A.[EndTime] >= C.[Time])
+			GROUP BY A.Driver,A.Trip,A.StartTime,A.EndTime
+				) AS H
+		ON A.Driver=H.Driver AND A.Trip=H.Trip AND (A.Time BETWEEN H.Starttime AND H.Endtime)
+
+	ORDER BY Event,Driver,Trip,Time
+		  
+

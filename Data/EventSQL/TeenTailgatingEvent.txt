@@ -1,0 +1,12 @@
+/****** Script for SelectTopNRows command from SSMS  ******/
+SELECT DISTINCT
+	ROW_NUMBER() OVER(ORDER BY A.Driver,A.Trip,A.Starttime) AS Event
+	  ,A.[Driver]
+      ,A.[Trip]
+	  ,A.[starttime]
+      ,A.[endtime]
+
+  FROM [Lv_Shan].[dbo].[TeenCIPVth] AS A INNER JOIN TeenPub.dbo.RoadTypeEvents AS B ON B.RoadType=1 AND A.Driver=B.Driver AND A.Trip=B.Trip AND A.starttime>=B.StartTime AND A.endtime<= B.EndTime
+  WHERE headway <= 1 
+  GROUP BY A.Driver,A.Trip,A.starttime,A.endtime
+  ORDER BY Event
